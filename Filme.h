@@ -8,17 +8,17 @@ using namespace std;
 
 class Filme {
     private: 
-        int ID, ano_lancamento, tempo_filme;
-        string tipo_titulo, titulo_primario, titulo_original;
+        int ano_lancamento, tempo_filme;
+        string ID, tipo_titulo, titulo_primario, titulo_original;
         vector<string> genero;
         bool eh_adulto;
 
     public:
         Filme();
-        Filme(int ID, int ano_lancamento, int tempo_filme, const string &tipo_titulo, const string &titulo_primario, const string &titulo_original, const vector<string> &genero, bool eh_adulto);
+        Filme(string ID, int ano_lancamento, int tempo_filme, const string &tipo_titulo, const string &titulo_primario, const string &titulo_original, const vector<string> &genero, bool eh_adulto);
 
         // Getters
-        int getID() const;
+        string getID() const;
         int getAnoLancamento() const;
         int getTempoFilme() const;
         string getTipoTitulo() const;
@@ -28,7 +28,7 @@ class Filme {
         bool isEhAdulto() const;
 
         // Setters
-        void setID(int ID);
+        void setID(string ID);
         void setAnoLancamento(int ano_lancamento);
         void setTempoFilme(int tempo_filme);
         void setTipoTitulo(const string &tipo_titulo);

@@ -5,7 +5,7 @@
 using namespace std;
 
 Filme::Filme() {} // Construtor vazio
-Filme::Filme(int ID, int ano_lancamento, int tempo_filme, const string &tipo_titulo, const string &titulo_primario, const string &titulo_original, const vector<string> &genero, bool eh_adulto) {
+Filme::Filme(string ID, int ano_lancamento, int tempo_filme, const string &tipo_titulo, const string &titulo_primario, const string &titulo_original, const vector<string> &genero, bool eh_adulto) {
     this->ID = ID;
     this->ano_lancamento = ano_lancamento;
     this->tempo_filme = tempo_filme;
@@ -18,7 +18,7 @@ Filme::Filme(int ID, int ano_lancamento, int tempo_filme, const string &tipo_tit
 
 
 // Getters
-int Filme::getID() const {
+string Filme::getID() const {
     return this->ID;
 }
 
@@ -51,7 +51,7 @@ bool Filme::isEhAdulto() const {
 }
 
 // Setters
-void Filme::setID(int ID) {
+void Filme::setID(string ID) {
     this->ID = ID;
 }
 
