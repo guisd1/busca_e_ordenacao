@@ -1,12 +1,12 @@
-#ifndef FILMES_H
-#define FILMES_H
+#ifndef FILME_H
+#define FILME_H
 
 #include<string>
 #include<vector>
 
 using namespace std;
 
-class Filmes {
+class Filme {
     private: 
         int ID, ano_lancamento, tempo_filme;
         string tipo_titulo, titulo_primario, titulo_original;
@@ -14,8 +14,8 @@ class Filmes {
         bool eh_adulto;
 
     public:
-        Filmes();
-        Filmes(int ID, int ano_lancamento, int tempo_filme, const string &tipo_titulo, const string &titulo_primario, const string &titulo_original, const vector<string> &genero, bool eh_adulto);
+        Filme();
+        Filme(int ID, int ano_lancamento, int tempo_filme, const string &tipo_titulo, const string &titulo_primario, const string &titulo_original, const vector<string> &genero, bool eh_adulto);
 
         // Getters
         int getID() const;
@@ -38,4 +38,4 @@ class Filmes {
         void setEhAdulto(bool eh_adulto);
 };
 
-#endif // FILMES_H
+#endif // FILME_H

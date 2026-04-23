@@ -1,20 +1,20 @@
-#ifndef CINEMAS_H
-#define CINEMAS_H
+#ifndef CINEMA_H
+#define CINEMA_H
 
 #include <string>
 #include <vector>
 
 using namespace std;
 
-class Cinemas {
+class Cinema {
 private:
     int ID;
     string nome_cinema, coordenada_x, coordenada_y, preco_ingresso;
     vector<int> filmes_em_exibicao; // IDs dos filmes em exibição
 
 public:
-    Cinemas();
-    Cinemas(int ID, const string &nome, const string &coordenada_x, const string &coordenada_y, const string &preco_ingresso, const vector<int> &filmes_em_exibicao);
+    Cinema();
+    Cinema(int ID, const string &nome, const string &coordenada_x, const string &coordenada_y, const string &preco_ingresso, const vector<int> &filmes_em_exibicao);
 
     // Getters
     int getID() const;
@@ -33,4 +33,4 @@ public:
     void setFilmesEmExibicao(const vector<int>& filmes);
 };
 
-#endif // CINEMAS_H
+#endif // CINEMA_H
