@@ -1,10 +1,10 @@
 #include<iostream>
-#include "filmes.cc"
-#include "cinemas.cc"
+#include "Filmes.cc"
+#include "Cinemas.cc"
 
 using namespace std;
 
 int main() {
-    cout << " World!" << endl;    
+    cout << "World!" << endl;    
     return 0;
 }

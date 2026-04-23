@@ -6,15 +6,15 @@
 
 using namespace std;
 
-class Cinema {
+class Cinemas {
 private:
     int ID;
     string nome_cinema, coordenada_x, coordenada_y, preco_ingresso;
     vector<int> filmes_em_exibicao; // IDs dos filmes em exibição
 
 public:
-    Cinema();
-    Cinema(int ID, const string &nome, const string &coordenada_x, const string &coordenada_y, const string &preco_ingresso, const vector<int> &filmes_em_exibicao);
+    Cinemas();
+    Cinemas(int ID, const string &nome, const string &coordenada_x, const string &coordenada_y, const string &preco_ingresso, const vector<int> &filmes_em_exibicao);
 
     // Getters
     int getID() const;
