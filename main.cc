@@ -1,4 +1,6 @@
 #include<iostream>
+#include "filmes.cc"
+#include "cinemas.cc"
 
 using namespace std;
 
