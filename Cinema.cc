@@ -1,52 +1,55 @@
 #include "Cinema.h"
-#include<iostream>
-#include<vector>
-
+#include <iostream>
+#include <vector>
 using namespace std;
 
-Cinema::Cinema() {} // Construtor vazio
-Cinema::Cinema(int ID, const string &nome_cinema, const string &coordenada_x, const string &coordenada_y, const string &preco_ingresso, const vector<int> &filmes_em_exibicao) {
+Cinema::Cinema() {}
+
+Cinema::Cinema(const string& ID, const string& nome_cinema, int coordenada_x, int coordenada_y, double preco_ingresso, const vector<string>& filmes_em_exibicao) {
     this->ID = ID;
     this->nome_cinema = nome_cinema;
     this->coordenada_x = coordenada_x;
     this->coordenada_y = coordenada_y;
     this->preco_ingresso = preco_ingresso;
     this->filmes_em_exibicao = filmes_em_exibicao;
-
-} // Construtor com parâmetros
-
+}
 
 // Getters
-int Cinema::getID() const { return ID; }
+const string& Cinema::getID() const { 
+    return ID; 
+}
 const string& Cinema::getNomeCinema() const { 
     return nome_cinema; 
 }
-const string& Cinema::getCoordenadaX() const { 
+int Cinema::getCoordenadaX() const { 
     return coordenada_x; 
 }
-const string& Cinema::getCoordenadaY() const { 
+int Cinema::getCoordenadaY() const { 
     return coordenada_y; 
 }
-const string& Cinema::getPrecoIngresso() const { 
+double Cinema::getPrecoIngresso() const { 
     return preco_ingresso; 
 }
-const vector<int>& Cinema::getFilmesEmExibicao() const { 
+const vector<string>& Cinema::getFilmesEmExibicao() const { 
     return filmes_em_exibicao; 
 }
 
 // Setters
-void Cinema::setNomeCinema(const string &nome_cinema) { 
+void Cinema::setID(const string& id) { 
+    this->ID = id; 
+}
+void Cinema::setNomeCinema(const string& nome_cinema) { 
     this->nome_cinema = nome_cinema; 
 }
-void Cinema::setCoordenadaX(const string &coordenada_x) { 
-    this->coordenada_x = coordenada_x; 
+void Cinema::setCoordenadaX(int x) { 
+    this->coordenada_x = x; 
 }
-void Cinema::setCoordenadaY(const string &coordenada_y) { 
-    this->coordenada_y = coordenada_y; 
+void Cinema::setCoordenadaY(int y) { 
+    this->coordenada_y = y; 
 }
-void Cinema::setPrecoIngresso(const string &preco_ingresso) { 
-    this->preco_ingresso = preco_ingresso; 
+void Cinema::setPrecoIngresso(double preco) { 
+    this->preco_ingresso = preco; 
 }
-void Cinema::setFilmesEmExibicao(const vector<int> &filmes_em_exibicao) { 
-    this->filmes_em_exibicao = filmes_em_exibicao; 
+void Cinema::setFilmesEmExibicao(const vector<string>& filmes) { 
+    this->filmes_em_exibicao = filmes; 
 }

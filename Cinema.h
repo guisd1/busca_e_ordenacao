@@ -1,36 +1,35 @@
 #ifndef CINEMA_H
 #define CINEMA_H
-
 #include <string>
 #include <vector>
-
 using namespace std;
 
 class Cinema {
 private:
-    int ID;
-    string nome_cinema, coordenada_x, coordenada_y, preco_ingresso;
-    vector<int> filmes_em_exibicao; // IDs dos filmes em exibição
+    string ID, nome_cinema;
+    int coordenada_x, coordenada_y;
+    double preco_ingresso;
+    vector<string> filmes_em_exibicao;
 
 public:
     Cinema();
-    Cinema(int ID, const string &nome, const string &coordenada_x, const string &coordenada_y, const string &preco_ingresso, const vector<int> &filmes_em_exibicao);
+    Cinema(const string& ID, const string& nome_cinema, int coordenada_x, int coordenada_y, double preco_ingresso, const vector<string>& filmes_em_exibicao);
 
     // Getters
-    int getID() const;
+    const string& getID() const;
     const string& getNomeCinema() const;
-    const string& getCoordenadaX() const;
-    const string& getCoordenadaY() const;
-    const string& getPrecoIngresso() const;
-    const vector<int>& getFilmesEmExibicao() const;
+    int getCoordenadaX() const;
+    int getCoordenadaY() const;
+    double getPrecoIngresso() const;
+    const vector<string>& getFilmesEmExibicao() const;
 
     // Setters
-    void setID(int id);
-    void setNomeCinema(const string& nome);
-    void setCoordenadaX(const string& x);
-    void setCoordenadaY(const string& y);
-    void setPrecoIngresso(const string& preco);
-    void setFilmesEmExibicao(const vector<int>& filmes);
+    void setID(const string& id);
+    void setNomeCinema(const string& nome_cinema);
+    void setCoordenadaX(int x);
+    void setCoordenadaY(int y);
+    void setPrecoIngresso(double preco);
+    void setFilmesEmExibicao(const vector<string>& filmes);
 };
 
 #endif // CINEMA_H
