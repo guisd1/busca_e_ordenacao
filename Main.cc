@@ -2,86 +2,139 @@
 #include "Cinema.cc"
 #include <iostream>
 #include <fstream>
-#include <sstream>
 #include <vector>
+#include <string>
+#include <chrono>
+
 using namespace std;
 
 int main() {
-    // Filmes
+    auto inicio_cronometro = chrono::high_resolution_clock::now();
+
+    // --- BLOCO DE FILMES (TSV) ---
     ifstream arquivoFilmes("documentos/filmesCrop.txt");
     if (!arquivoFilmes.is_open()) {
         cout << "Erro ao abrir filmes!" << endl;
         return 1;
     }
+
     string linha;
     vector<Filme> listaFilmes;
-    getline(arquivoFilmes, linha); // pula cabeçalho
+    listaFilmes.reserve(600000);
+
+    getline(arquivoFilmes, linha); // Pula cabeçalho dos filmes
+
     while (getline(arquivoFilmes, linha)) {
-        stringstream ss(linha);
-        string sID, tipo_titulo, titulo_primario, titulo_original;
-        string sAdulto, sAno, sTempo, sGenero;
-        getline(ss, sID, '\t');
-        getline(ss, tipo_titulo, '\t');
-        getline(ss, titulo_primario, '\t');
-        getline(ss, titulo_original, '\t');
-        getline(ss, sAdulto, '\t');
-        getline(ss, sAno, '\t');
-        getline(ss, sTempo, '\t');
-        getline(ss, sGenero, '\t');
-        vector<string> genero;
-        stringstream ssGenero(sGenero);
-        string g;
-        while (getline(ssGenero, g, ',')) genero.push_back(g);
+        if (linha.empty()) continue;
+
+        size_t cursor = 0, divisor;
+        auto extrairF = [&](char delim) -> string {
+            if (cursor == string::npos) return "";
+            divisor = linha.find(delim, cursor);
+            string campo = linha.substr(cursor, divisor - cursor);
+            cursor = (divisor == string::npos) ? string::npos : divisor + 1;
+            return campo;
+        };
+
+        string sID = extrairF('\t');
+        string tipo = extrairF('\t');
+        string tPri = extrairF('\t');
+        string tOri = extrairF('\t');
+        string sAdulto = extrairF('\t');
+        string sAno = extrairF('\t');
+        string sTempo = extrairF('\t');
+        string sGen = extrairF('\t');
+
+        vector<string> generos;
+        size_t g_pos = 0, g_div;
+        while ((g_div = sGen.find(',', g_pos)) != string::npos) {
+            generos.push_back(sGen.substr(g_pos, g_div - g_pos));
+            g_pos = g_div + 1;
+        }
+        if(!sGen.empty()) generos.push_back(sGen.substr(g_pos));
+
         int ano = 0, tempo = 0;
-        try { ano = stoi(sAno); } catch (const invalid_argument& e) { ano = 0; }
-        try { tempo = stoi(sTempo); } catch (const invalid_argument& e) { tempo = 0; }
+        try { if (!sAno.empty() && sAno != "\\N") ano = stoi(sAno); } catch (...) { ano = 0; }
+        try { if (!sTempo.empty() && sTempo != "\\N") tempo = stoi(sTempo); } catch (...) { tempo = 0; }
+
         Filme f;
-        f.setID(sID);
-        f.setTipoTitulo(tipo_titulo);
-        f.setTituloPrimario(titulo_primario);
-        f.setTituloOriginal(titulo_original);
+        f.setID(std::move(sID));
+        f.setTipoTitulo(std::move(tipo));
+        f.setTituloPrimario(std::move(tPri));
+        f.setTituloOriginal(std::move(tOri));
         f.setEhAdulto(sAdulto == "1");
         f.setAnoLancamento(ano);
         f.setTempoFilme(tempo);
-        f.setGenero(genero);
-        listaFilmes.push_back(f);
+        f.setGenero(std::move(generos));
+        listaFilmes.push_back(std::move(f));
     }
     arquivoFilmes.close();
 
-    // Cinemas
+    // --- BLOCO DE CINEMAS (CSV) ---
     ifstream arquivoCinemas("documentos/cinemas.txt");
     if (!arquivoCinemas.is_open()) {
         cout << "Erro ao abrir cinemas!" << endl;
         return 1;
     }
+
     vector<Cinema> listaCinemas;
+    
+    // CORREÇÃO: Pula a primeira linha (cabeçalho) do arquivo de cinemas
+    if (getline(arquivoCinemas, linha)) {
+        // Apenas lê a linha e não faz nada, deixando o cursor na segunda linha
+    }
+
     while (getline(arquivoCinemas, linha)) {
-        stringstream ss(linha);
-        string sID, nome_cinema, sCoordenadaX, sCoordenadaY, sPreco, sFilme;
-        getline(ss, sID, ',');
-        getline(ss, nome_cinema, ',');
-        getline(ss, sCoordenadaX, ',');
-        getline(ss, sCoordenadaY, ',');
-        getline(ss, sPreco, ',');
-        vector<string> filmesEmExibicao;
-        while (getline(ss, sFilme, ',')) {
-            sFilme.erase(0, sFilme.find_first_not_of(" "));
-            sFilme.erase(sFilme.find_last_not_of(" \r") + 1);
-            if (!sFilme.empty()) filmesEmExibicao.push_back(sFilme);
+        if (linha.empty()) continue;
+
+        size_t cursor = 0, divisor;
+        auto extrairC = [&](char delim) -> string {
+            if (cursor == string::npos) return "";
+            divisor = linha.find(delim, cursor);
+            string campo = linha.substr(cursor, divisor - cursor);
+            cursor = (divisor == string::npos) ? string::npos : divisor + 1;
+            return campo;
+        };
+
+        // Extrai campos fixos (separados por vírgula)
+        string cID = extrairC(',');
+        string cNome = extrairC(',');
+        string cX = extrairC(',');
+        string cY = extrairC(',');
+        string cPreco = extrairC(',');
+
+        // Extrai o restante da linha como filmes em exibição
+        vector<string> filmes;
+        while (cursor != string::npos) {
+            string idFilme = extrairC(',');
+            // Limpa espaços e \r do ID do filme
+            size_t p = idFilme.find_first_not_of(" ");
+            if (p != string::npos) {
+                size_t u = idFilme.find_last_not_of(" \r");
+                idFilme = idFilme.substr(p, (u - p + 1));
+                if (!idFilme.empty()) filmes.push_back(std::move(idFilme));
+            }
         }
+
         Cinema c;
-        c.setID(sID);
-        c.setNomeCinema(nome_cinema);
-        try { c.setCoordenadaX(stoi(sCoordenadaX)); } catch (const invalid_argument& e) { c.setCoordenadaX(0); }
-        try { c.setCoordenadaY(stoi(sCoordenadaY)); } catch (const invalid_argument& e) { c.setCoordenadaY(0); }
-        try { c.setPrecoIngresso(stod(sPreco)); } catch (const invalid_argument& e) { c.setPrecoIngresso(0); }
-        c.setFilmesEmExibicao(filmesEmExibicao);
-        listaCinemas.push_back(c);
+        c.setID(std::move(cID));
+        c.setNomeCinema(std::move(cNome));
+        try { c.setCoordenadaX(stoi(cX)); } catch (...) { c.setCoordenadaX(0); }
+        try { c.setCoordenadaY(stoi(cY)); } catch (...) { c.setCoordenadaY(0); }
+        try { c.setPrecoIngresso(stod(cPreco)); } catch (...) { c.setPrecoIngresso(0.0); }
+        c.setFilmesEmExibicao(std::move(filmes));
+        
+        listaCinemas.push_back(std::move(c));
     }
     arquivoCinemas.close();
 
+    // --- RESULTADOS ---
+    auto fim_cronometro = chrono::high_resolution_clock::now();
+    chrono::duration<double> duracao = fim_cronometro - inicio_cronometro;
+
     cout << "Filmes lidos: " << listaFilmes.size() << endl;
     cout << "Cinemas lidos: " << listaCinemas.size() << endl;
+    cout << "Tempo total: " << duracao.count() * 1000 << " ms" << endl;
 
     return 0;
 }
