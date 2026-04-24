@@ -1,6 +1,6 @@
 #include "Filme.cc"
 #include "Cinema.cc"
-#include "LerListas.cc"
+#include "LeitorDados.cc"
 #include <iostream>
 #include <vector>
 #include <string>
@@ -9,8 +9,8 @@
 using namespace std;
 
 int main() {
-    LerListas lerlistas;
-    lerlistas.lerListas();
+    LeitorDados ler_dados;
+    ler_dados.lerDados();
 
     return 0;
 }

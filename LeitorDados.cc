@@ -8,9 +8,9 @@
 
 using namespace std;
 
-class LerListas {
+class LeitorDados {
     public:
-        void lerListas() {
+        void lerDados() {
             // Implementação para ler as listas de filmes e cinemas
             auto inicio_cronometro = chrono::high_resolution_clock::now();
 
