@@ -20,7 +20,7 @@ public:
     void lerDados() {
         auto inicio_cronometro = chrono::high_resolution_clock::now();
 
-        // --- FILMES ---
+        //FILMES
         ifstream arquivoFilmes("documentos/filmesCrop.txt");
         if (!arquivoFilmes.is_open()) { cout << "Erro ao abrir filmes!" << endl; return; }
 
@@ -46,7 +46,7 @@ public:
             string tOri   = extrairF('\t');
             string sAdult = extrairF('\t');
             string sAno   = extrairF('\t');
-            string sEndY = extrairF('\t');
+            string sEndY  = extrairF('\t');
             string sTempo = extrairF('\t');
             string sGen   = extrairF('\t');
 
@@ -86,11 +86,10 @@ public:
             idsOrdenados.push_back(f.getID());
         sort(idsOrdenados.begin(), idsOrdenados.end());
 
-        // --- CINEMAS ---
+        //CINEMAS
         ifstream arquivoCinemas("documentos/cinemas.txt");
         if (!arquivoCinemas.is_open()) { cout << "Erro ao abrir cinemas!" << endl; return; }
-
-        getline(arquivoCinemas, linha); // pula cabeçalho
+        getline(arquivoCinemas, linha);
 
         while (getline(arquivoCinemas, linha)) {
             if (linha.empty()) continue;

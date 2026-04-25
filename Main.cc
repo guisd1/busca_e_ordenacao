@@ -12,20 +12,26 @@ int main() {
     
     Buscador buscador(leitor.getFilmes(), leitor.getCinemas(), leitor.getIndice());
 
-    int opcao;
-    cout << "\nO que deseja buscar?" << endl;
-    cout << "1. Filmes" << endl;
-    cout << "2. Cinemas" << endl;
-    cout << "Opcao: ";
-    cin >> opcao;
+    int opcao = -1;
 
-    auto inicio = chrono::high_resolution_clock::now();
+    while (opcao != 0) {
+        cout << "\n========================";
+        cout << "\nO que deseja buscar?" << endl;
+        cout << "========================" << endl;
+        cout << "1. Filmes" << endl;
+        cout << "2. Cinemas" << endl;
+        cout << "0. Sair" << endl;
+        cout << "========================" << endl;
+        cout << "Opcao: ";
+        cin >> opcao;
 
-    if (opcao == 1) {
-        vector<Filme> result = buscador.buscarFilmes();
+        auto inicio = chrono::high_resolution_clock::now();
 
-    } else if (opcao == 2) {
-        vector<Cinema> result = buscador.buscarCinemas();
+        if (opcao == 1) {
+            vector<Filme> result = buscador.buscarFilmes();
+        } else if (opcao == 2) {
+            vector<Cinema> result = buscador.buscarCinemas();
+        }
     }
 
     return 0;
