@@ -208,7 +208,11 @@ vector<Filme> Buscador::buscarFilmes() {
             cout << "Quantos tipos? "; cin >> n;
             vector<string> tipos(n);
             for (auto& t : tipos) { cout << "Tipo: "; cin >> t; }
+            auto inicio = chrono::high_resolution_clock::now();
             resultado = filtrarPorTipo(resultado, tipos, op == 2);
+            auto fim = chrono::high_resolution_clock::now();
+            chrono::duration<double> dur = fim - inicio;
+            
 
         } else if (opcao == 2) {
             int op, n; cout << "Operador (1=OU 2=E): "; cin >> op;

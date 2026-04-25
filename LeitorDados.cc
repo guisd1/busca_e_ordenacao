@@ -46,6 +46,7 @@ public:
             string tOri   = extrairF('\t');
             string sAdult = extrairF('\t');
             string sAno   = extrairF('\t');
+            string sEndY = extrairF('\t');
             string sTempo = extrairF('\t');
             string sGen   = extrairF('\t');
 
