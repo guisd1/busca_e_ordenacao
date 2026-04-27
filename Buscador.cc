@@ -1,112 +1,116 @@
 #include "Buscador.h"
 #include <iostream>
 #include <cmath>
-#include <algorithm>
 #include <chrono>
 using namespace std;
 
-Buscador::Buscador(const vector<Filme>& f, const vector<Cinema>& c, const unordered_map<string, int>& idx)
+Buscador::Buscador(const vector<Filme>& f, const vector<Cinema>& c,
+                   const vector<pair<string,int>>& idx)
     : filmes(f), cinemas(c), indice(idx) {}
 
-// ── AUXILIAR ────────────────────────────────────────────────────
+// ── AUXILIAR ─────────────────────────────────────────────────────────────────
 
 const Filme* Buscador::buscarFilmePorID(const string& id) const {
-    auto it = indice.find(id);
-    if (it != indice.end())
-        return &filmes[it->second];
-
-    // Caso especial: ID não existe → busca o ID maior mais próximo
-    // Os IDs são strings no formato "tt1234567", comparação lexicográfica funciona
-    const Filme* melhor = nullptr;
-    for (const Filme& f : filmes) {
-        if (f.getID() > id) {
-            if (melhor == nullptr || f.getID() < melhor->getID())
-                melhor = &f;
-        }
+    // Busca binária O(log n) no índice ordenado
+    int esq = 0, dir = (int)indice.size() - 1;
+    while (esq <= dir) {
+        int meio = esq + (dir - esq) / 2;
+        if      (indice[meio].first == id) return &filmes[indice[meio].second];
+        else if (indice[meio].first  < id) esq = meio + 1;
+        else                               dir = meio - 1;
     }
-    return melhor;
+    // Fallback: ID maior mais próximo via upper_bound binário
+    int ub = (int)indice.size();
+    esq = 0; dir = ub;
+    while (esq < dir) {
+        int meio = esq + (dir - esq) / 2;
+        if (indice[meio].first <= id) esq = meio + 1;
+        else                          dir = meio;
+    }
+    return (esq < ub) ? &filmes[indice[esq].second] : nullptr;
 }
 
-// ── FILTROS DE FILME ────────────────────────────────────────────
+// ── FILTROS DE FILME ──────────────────────────────────────────────────────────
 
-vector<Filme> Buscador::filtrarPorTipo(const vector<Filme>& lista, const vector<string>& tipos, bool operadorE) {
+vector<Filme> Buscador::filtrarPorTipo(const vector<Filme>& lista,
+                                       const vector<string>& tipos, bool op) {
     vector<Filme> resultado;
     for (const Filme& f : lista) {
-        bool match = operadorE;
+        bool match = op; // true para E, false para OU
         for (const string& tipo : tipos) {
             bool igual = (f.getTipoTitulo() == tipo);
-            if (operadorE) match = match && igual;
-            else           match = match || igual;
+            if (op) match = match && igual;
+            else    match = match || igual;
         }
         if (match) resultado.push_back(f);
     }
     return resultado;
 }
 
-vector<Filme> Buscador::filtrarPorGenero(const vector<Filme>& lista, const vector<string>& generos, bool operadorE) {
+vector<Filme> Buscador::filtrarPorGenero(const vector<Filme>& lista,
+                                         const vector<string>& generos, bool op) {
     vector<Filme> resultado;
     for (const Filme& f : lista) {
         const vector<string>& gf = f.getGenero();
-        bool match = operadorE;
+        bool match = op;
         for (const string& g : generos) {
             bool tem = false;
-            for (const string& gFilme : gf)
-                if (gFilme == g) { tem = true; break; }
-            if (operadorE) match = match && tem;
-            else           match = match || tem;
+            for (const string& gf2 : gf)
+                if (gf2 == g) { tem = true; break; }
+            if (op) match = match && tem;
+            else    match = match || tem;
         }
         if (match) resultado.push_back(f);
     }
     return resultado;
 }
 
-vector<Filme> Buscador::filtrarPorDuracao(const vector<Filme>& lista, int minMin, int maxMin) {
+vector<Filme> Buscador::filtrarPorDuracao(const vector<Filme>& lista, int mn, int mx) {
     vector<Filme> resultado;
     for (const Filme& f : lista) {
         int t = f.getTempoFilme();
-        if (t > 0 && t >= minMin && t <= maxMin)
-            resultado.push_back(f);
+        if (t > 0 && t >= mn && t <= mx) resultado.push_back(f);
     }
     return resultado;
 }
 
-vector<Filme> Buscador::filtrarPorAno(const vector<Filme>& lista, int anoMin, int anoMax) {
+vector<Filme> Buscador::filtrarPorAno(const vector<Filme>& lista, int a1, int a2) {
     vector<Filme> resultado;
     for (const Filme& f : lista) {
         int ano = f.getAnoLancamento();
-        if (ano > 0 && ano >= anoMin && ano <= anoMax)
-            resultado.push_back(f);
+        if (ano > 0 && ano >= a1 && ano <= a2) resultado.push_back(f);
     }
     return resultado;
 }
 
-// ── FILTROS DE CINEMA ───────────────────────────────────────────
+// ── FILTROS DE CINEMA ─────────────────────────────────────────────────────────
 
-vector<Cinema> Buscador::filtrarPorPreco(const vector<Cinema>& lista, double precoMax) {
+vector<Cinema> Buscador::filtrarPorPreco(const vector<Cinema>& lista, double pmax) {
     vector<Cinema> resultado;
     for (const Cinema& c : lista)
-        if (c.getPrecoIngresso() <= precoMax)
-            resultado.push_back(c);
+        if (c.getPrecoIngresso() <= pmax) resultado.push_back(c);
     return resultado;
 }
 
-vector<Cinema> Buscador::filtrarPorDistancia(const vector<Cinema>& lista, int x, int y, double distMax) {
+vector<Cinema> Buscador::filtrarPorDistancia(const vector<Cinema>& lista,
+                                             int x, int y, double distMax) {
     vector<Cinema> resultado;
     for (const Cinema& c : lista) {
         double dx = c.getCoordenadaX() - x;
         double dy = c.getCoordenadaY() - y;
-        if (sqrt(dx*dx + dy*dy) <= distMax)
-            resultado.push_back(c);
+        if (sqrt(dx*dx + dy*dy) <= distMax) resultado.push_back(c);
     }
     return resultado;
 }
 
-vector<Cinema> Buscador::filtrarCinemaPorTitulo(const vector<Cinema>& lista, const string& titulo) {
+vector<Cinema> Buscador::filtrarCinemaPorTitulo(const vector<Cinema>& lista,
+                                                const string& titulo) {
     vector<Cinema> resultado;
     for (const Cinema& c : lista) {
-        for (const string& idFilme : c.getFilmesEmExibicao()) {
-            const Filme* f = buscarFilmePorID(idFilme);
-            if (f && (f->getTituloPrimario() == titulo || f->getTituloOriginal() == titulo)) {
+        for (const string& id : c.getFilmesEmExibicao()) {
+            const Filme* f = buscarFilmePorID(id);
+            if (f && (f->getTituloPrimario() == titulo ||
+                      f->getTituloOriginal() == titulo)) {
                 resultado.push_back(c);
                 break;
             }
@@ -115,18 +119,19 @@ vector<Cinema> Buscador::filtrarCinemaPorTitulo(const vector<Cinema>& lista, con
     return resultado;
 }
 
-vector<Cinema> Buscador::filtrarCinemaPorTipo(const vector<Cinema>& lista, const vector<string>& tipos, bool operadorE) {
+vector<Cinema> Buscador::filtrarCinemaPorTipo(const vector<Cinema>& lista,
+                                              const vector<string>& tipos, bool op) {
     vector<Cinema> resultado;
     for (const Cinema& c : lista) {
         bool cinemaMatch = false;
-        for (const string& idFilme : c.getFilmesEmExibicao()) {
-            const Filme* f = buscarFilmePorID(idFilme);
+        for (const string& id : c.getFilmesEmExibicao()) {
+            const Filme* f = buscarFilmePorID(id);
             if (!f) continue;
-            bool filmeMatch = operadorE;
+            bool filmeMatch = op;
             for (const string& tipo : tipos) {
                 bool igual = (f->getTipoTitulo() == tipo);
-                if (operadorE) filmeMatch = filmeMatch && igual;
-                else           filmeMatch = filmeMatch || igual;
+                if (op) filmeMatch = filmeMatch && igual;
+                else    filmeMatch = filmeMatch || igual;
             }
             if (filmeMatch) { cinemaMatch = true; break; }
         }
@@ -135,21 +140,22 @@ vector<Cinema> Buscador::filtrarCinemaPorTipo(const vector<Cinema>& lista, const
     return resultado;
 }
 
-vector<Cinema> Buscador::filtrarCinemaPorGenero(const vector<Cinema>& lista, const vector<string>& generos, bool operadorE) {
+vector<Cinema> Buscador::filtrarCinemaPorGenero(const vector<Cinema>& lista,
+                                                const vector<string>& generos, bool op) {
     vector<Cinema> resultado;
     for (const Cinema& c : lista) {
         bool cinemaMatch = false;
-        for (const string& idFilme : c.getFilmesEmExibicao()) {
-            const Filme* f = buscarFilmePorID(idFilme);
+        for (const string& id : c.getFilmesEmExibicao()) {
+            const Filme* f = buscarFilmePorID(id);
             if (!f) continue;
             const vector<string>& gf = f->getGenero();
-            bool filmeMatch = operadorE;
+            bool filmeMatch = op;
             for (const string& g : generos) {
                 bool tem = false;
-                for (const string& gFilme : gf)
-                    if (gFilme == g) { tem = true; break; }
-                if (operadorE) filmeMatch = filmeMatch && tem;
-                else           filmeMatch = filmeMatch || tem;
+                for (const string& gf2 : gf)
+                    if (gf2 == g) { tem = true; break; }
+                if (op) filmeMatch = filmeMatch && tem;
+                else    filmeMatch = filmeMatch || tem;
             }
             if (filmeMatch) { cinemaMatch = true; break; }
         }
@@ -158,61 +164,57 @@ vector<Cinema> Buscador::filtrarCinemaPorGenero(const vector<Cinema>& lista, con
     return resultado;
 }
 
-vector<Cinema> Buscador::filtrarCinemaPorDuracao(const vector<Cinema>& lista, int minMin, int maxMin) {
+vector<Cinema> Buscador::filtrarCinemaPorDuracao(const vector<Cinema>& lista,
+                                                 int mn, int mx) {
     vector<Cinema> resultado;
     for (const Cinema& c : lista) {
-        bool cinemaMatch = false;
-        for (const string& idFilme : c.getFilmesEmExibicao()) {
-            const Filme* f = buscarFilmePorID(idFilme);
+        bool match = false;
+        for (const string& id : c.getFilmesEmExibicao()) {
+            const Filme* f = buscarFilmePorID(id);
             if (!f) continue;
             int t = f->getTempoFilme();
-            if (t > 0 && t >= minMin && t <= maxMin) { cinemaMatch = true; break; }
+            if (t > 0 && t >= mn && t <= mx) { match = true; break; }
         }
-        if (cinemaMatch) resultado.push_back(c);
+        if (match) resultado.push_back(c);
     }
     return resultado;
 }
 
-vector<Cinema> Buscador::filtrarCinemaPorAno(const vector<Cinema>& lista, int anoMin, int anoMax) {
+vector<Cinema> Buscador::filtrarCinemaPorAno(const vector<Cinema>& lista,
+                                             int a1, int a2) {
     vector<Cinema> resultado;
     for (const Cinema& c : lista) {
-        bool cinemaMatch = false;
-        for (const string& idFilme : c.getFilmesEmExibicao()) {
-            const Filme* f = buscarFilmePorID(idFilme);
+        bool match = false;
+        for (const string& id : c.getFilmesEmExibicao()) {
+            const Filme* f = buscarFilmePorID(id);
             if (!f) continue;
             int ano = f->getAnoLancamento();
-            if (ano > 0 && ano >= anoMin && ano <= anoMax) { cinemaMatch = true; break; }
+            if (ano > 0 && ano >= a1 && ano <= a2) { match = true; break; }
         }
-        if (cinemaMatch) resultado.push_back(c);
+        if (match) resultado.push_back(c);
     }
     return resultado;
 }
 
-// ── MENUS ───────────────────────────────────────────────────────
+// ── MENUS ─────────────────────────────────────────────────────────────────────
 
 vector<Filme> Buscador::buscarFilmes() {
     vector<Filme> resultado(filmes);
     int opcao;
     do {
-        cout << "\n=== FILTROS DE FILME ===" << endl;
-        cout << "1. Por tipo" << endl;
-        cout << "2. Por genero" << endl;
-        cout << "3. Por duracao" << endl;
-        cout << "4. Por ano" << endl;
-        cout << "0. Concluir" << endl;
-        cout << "Opcao: ";
+        cout << "\n=== FILTROS DE FILME ===\n"
+             << "1. Por tipo\n2. Por genero\n3. Por duracao\n4. Por ano\n0. Concluir\n"
+             << "Opcao: ";
         cin >> opcao;
+
+        auto inicio = chrono::high_resolution_clock::now();
 
         if (opcao == 1) {
             int op, n; cout << "Operador (1=OU 2=E): "; cin >> op;
             cout << "Quantos tipos? "; cin >> n;
             vector<string> tipos(n);
             for (auto& t : tipos) { cout << "Tipo: "; cin >> t; }
-            auto inicio = chrono::high_resolution_clock::now();
             resultado = filtrarPorTipo(resultado, tipos, op == 2);
-            auto fim = chrono::high_resolution_clock::now();
-            chrono::duration<double> dur = fim - inicio;
-            
 
         } else if (opcao == 2) {
             int op, n; cout << "Operador (1=OU 2=E): "; cin >> op;
@@ -234,9 +236,12 @@ vector<Filme> Buscador::buscarFilmes() {
             resultado = filtrarPorAno(resultado, a1, a2);
         }
 
-        if (opcao != 0)
-            cout << "Resultados parciais: " << resultado.size() << endl;
-
+        if (opcao != 0) {
+            auto fim = chrono::high_resolution_clock::now();
+            chrono::duration<double, milli> dur = fim - inicio;
+            cout << "Resultados parciais: " << resultado.size()
+                 << "  (" << dur.count() << " ms)\n";
+        }
     } while (opcao != 0);
     return resultado;
 }
@@ -245,17 +250,14 @@ vector<Cinema> Buscador::buscarCinemas() {
     vector<Cinema> resultado(cinemas);
     int opcao;
     do {
-        cout << "\n=== FILTROS DE CINEMA ===" << endl;
-        cout << "1. Por tipo de filme" << endl;
-        cout << "2. Por genero de filme" << endl;
-        cout << "3. Por duracao de filme" << endl;
-        cout << "4. Por ano de filme" << endl;
-        cout << "5. Por distancia" << endl;
-        cout << "6. Por preco" << endl;
-        cout << "7. Por titulo de filme" << endl;
-        cout << "0. Concluir" << endl;
-        cout << "Opcao: ";
+        cout << "\n=== FILTROS DE CINEMA ===\n"
+             << "1. Por tipo de filme\n2. Por genero de filme\n"
+             << "3. Por duracao de filme\n4. Por ano de filme\n"
+             << "5. Por distancia\n6. Por preco\n7. Por titulo de filme\n0. Concluir\n"
+             << "Opcao: ";
         cin >> opcao;
+
+        auto inicio = chrono::high_resolution_clock::now();
 
         if (opcao == 1) {
             int op, n; cout << "Operador (1=OU 2=E): "; cin >> op;
@@ -303,9 +305,12 @@ vector<Cinema> Buscador::buscarCinemas() {
             resultado = filtrarCinemaPorTitulo(resultado, titulo);
         }
 
-        if (opcao != 0)
-            cout << "Resultados parciais: " << resultado.size() << endl;
-
+        if (opcao != 0) {
+            auto fim = chrono::high_resolution_clock::now();
+            chrono::duration<double, milli> dur = fim - inicio;
+            cout << "Resultados parciais: " << resultado.size()
+                 << "  (" << dur.count() << " ms)\n";
+        }
     } while (opcao != 0);
     return resultado;
 }
