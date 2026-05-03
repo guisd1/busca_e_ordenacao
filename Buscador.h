@@ -4,13 +4,14 @@
 #include "Cinema.h"
 #include <vector>
 #include <string>
+
 using namespace std;
 
 class Buscador {
 private:
     const vector<Filme>&            filmes;
     const vector<Cinema>&           cinemas;
-    const vector<pair<string,int>>& indice; // índice ordenado por merge sort
+    const vector<pair<string,int>>& indice; // Retornado para vector ordenado por merge sort
 
     const Filme* buscarFilmePorID(const string& id) const;
 

@@ -2,12 +2,9 @@
 #include <iostream>
 #include <cmath>
 #include <algorithm>
-#include <unordered_map>
 #include <chrono>
-#include <limits> // Necessário para numeric_limits
+#include <limits>
 using namespace std;
-
-// ── FUNÇÕES AUXILIARES DE LEITURA SEGURA ────────────────────────
 
 static int lerInteiroSeguro() {
     int valor;
@@ -16,8 +13,8 @@ static int lerInteiroSeguro() {
             return valor;
         } else {
             cout << "Entrada invalida! Digite um numero inteiro: ";
-            cin.clear(); // Limpa o estado de erro do cin
-            cin.ignore(numeric_limits<streamsize>::max(), '\n'); // Descarta o texto incorreto
+            cin.clear(); 
+            cin.ignore(numeric_limits<streamsize>::max(), '\n'); 
         }
     }
 }
@@ -35,16 +32,24 @@ static double lerDoubleSeguro() {
     }
 }
 
-Buscador::Buscador(const vector<Filme>& f, const vector<Cinema>& c, const unordered_map<string, int>& idx)
+Buscador::Buscador(const vector<Filme>& f, const vector<Cinema>& c, const vector<pair<string, int>>& idx)
     : filmes(f), cinemas(c), indice(idx) {}
 
-// ── AUXILIAR ────────────────────────────────────────────────────
-
 const Filme* Buscador::buscarFilmePorID(const string& id) const {
-    auto it = indice.find(id);
-    if (it != indice.end())
-        return &filmes[it->second];
+    // Busca binária no vetor ordenado
+    int esq = 0, dir = (int)indice.size() - 1;
+    while (esq <= dir) {
+        int meio = esq + (dir - esq) / 2;
+        if (indice[meio].first == id) {
+            return &filmes[indice[meio].second];
+        } else if (indice[meio].first < id) {
+            esq = meio + 1;
+        } else {
+            dir = meio - 1;
+        }
+    }
 
+    // Fallback: se não achar, procura o próximo maior id
     const Filme* melhor = nullptr;
     for (const Filme& f : filmes) {
         if (f.getID() > id) {
@@ -54,8 +59,6 @@ const Filme* Buscador::buscarFilmePorID(const string& id) const {
     }
     return melhor;
 }
-
-// ── FILTROS DE FILME ────────────────────────────────────────────
 
 vector<Filme> Buscador::filtrarPorTipo(const vector<Filme>& lista, const vector<string>& tipos, bool operadorE) {
     vector<Filme> resultado;
@@ -107,8 +110,6 @@ vector<Filme> Buscador::filtrarPorAno(const vector<Filme>& lista, int anoMin, in
     }
     return resultado;
 }
-
-// ── FILTROS DE CINEMA ───────────────────────────────────────────
 
 vector<Cinema> Buscador::filtrarPorPreco(const vector<Cinema>& lista, double precoMax) {
     vector<Cinema> resultado;
@@ -216,8 +217,6 @@ vector<Cinema> Buscador::filtrarCinemaPorAno(const vector<Cinema>& lista, int an
     return resultado;
 }
 
-// ── MENUS ───────────────────────────────────────────────────────
-
 vector<Filme> Buscador::buscarFilmes() {
     vector<Filme> resultado(filmes);
     int opcao;
@@ -236,11 +235,7 @@ vector<Filme> Buscador::buscarFilmes() {
             cout << "Operador (1=OU 2=E): "; int op = lerInteiroSeguro();
             cout << "Quantos tipos? "; int n = lerInteiroSeguro();
             vector<string> tipos(n);
-<<<<<<< HEAD
-            for (auto& t : tipos) { cout << "Tipo: "; cin >> t; }
-=======
-            for (auto& t : tipos) { cout << "Tipo: "; cin >> t; } // cin para string é ok, não quebra o stream
->>>>>>> ajustes
+            for (auto& t : tipos) { cout << "Tipo: "; cin >> t; } 
             
             auto inicio = chrono::high_resolution_clock::now();
             resultado = filtrarPorTipo(resultado, tipos, op == 2);
@@ -261,14 +256,8 @@ vector<Filme> Buscador::buscarFilmes() {
             cout << "Tempo de busca: " << dur.count()*1000<< " ms\n";
 
         } else if (opcao == 3) {
-<<<<<<< HEAD
-            int mn, mx;
-            cout << "Duracao minima (min): "; cin >> mn;
-            cout << "Duracao maxima (min): "; cin >> mx;
-=======
             cout << "Duracao minima (min): "; int mn = lerInteiroSeguro();
             cout << "Duracao maxima (min): "; int mx = lerInteiroSeguro();
->>>>>>> ajustes
             
             auto inicio = chrono::high_resolution_clock::now();
             resultado = filtrarPorDuracao(resultado, mn, mx);
@@ -277,14 +266,8 @@ vector<Filme> Buscador::buscarFilmes() {
             cout << "Tempo de busca: " << dur.count()*1000<< " ms\n";
 
         } else if (opcao == 4) {
-<<<<<<< HEAD
-            int a1, a2;
-            cout << "Ano inicial: "; cin >> a1;
-            cout << "Ano final:   "; cin >> a2;
-=======
             cout << "Ano inicial: "; int a1 = lerInteiroSeguro();
             cout << "Ano final:   "; int a2 = lerInteiroSeguro();
->>>>>>> ajustes
             
             auto inicio = chrono::high_resolution_clock::now();
             resultado = filtrarPorAno(resultado, a1, a2);
@@ -293,14 +276,8 @@ vector<Filme> Buscador::buscarFilmes() {
             cout << "Tempo de busca: " << dur.count()*1000<< " ms\n";
             
         } else if (opcao == 5) {
-<<<<<<< HEAD
-            int qtd;
-            cout << "Quantos resultados deseja exibir? ";
-            cin >> qtd;
-=======
             cout << "Quantos resultados deseja exibir? ";
             int qtd = lerInteiroSeguro();
->>>>>>> ajustes
             
             int limite = qtd;
             if (qtd > (int)resultado.size()) {
@@ -315,10 +292,6 @@ vector<Filme> Buscador::buscarFilmes() {
             cout << "------------------\n";
         }
 
-<<<<<<< HEAD
-        // Exibe quantidade parcial apenas se a opção foi um filtro
-=======
->>>>>>> ajustes
         if (opcao >= 1 && opcao <= 4)
             cout << "Resultados parciais: " << resultado.size() << endl;
 
@@ -368,14 +341,8 @@ vector<Cinema> Buscador::buscarCinemas() {
             cout << "Tempo de busca: " << dur.count()*1000<< " ms\n";
 
         } else if (opcao == 3) {
-<<<<<<< HEAD
-            int mn, mx;
-            cout << "Duracao minima (min): "; cin >> mn;
-            cout << "Duracao maxima (min): "; cin >> mx;
-=======
             cout << "Duracao minima (min): "; int mn = lerInteiroSeguro();
             cout << "Duracao maxima (min): "; int mx = lerInteiroSeguro();
->>>>>>> ajustes
             
             auto inicio = chrono::high_resolution_clock::now();
             resultado = filtrarCinemaPorDuracao(resultado, mn, mx);
@@ -384,14 +351,8 @@ vector<Cinema> Buscador::buscarCinemas() {
             cout << "Tempo de busca: " << dur.count()*1000<< " ms\n";
 
         } else if (opcao == 4) {
-<<<<<<< HEAD
-            int a1, a2;
-            cout << "Ano inicial: "; cin >> a1;
-            cout << "Ano final:   "; cin >> a2;
-=======
             cout << "Ano inicial: "; int a1 = lerInteiroSeguro();
             cout << "Ano final:   "; int a2 = lerInteiroSeguro();
->>>>>>> ajustes
             
             auto inicio = chrono::high_resolution_clock::now();
             resultado = filtrarCinemaPorAno(resultado, a1, a2);
@@ -400,16 +361,9 @@ vector<Cinema> Buscador::buscarCinemas() {
             cout << "Tempo de busca: " << dur.count()*1000<< " ms\n";
 
         } else if (opcao == 5) {
-<<<<<<< HEAD
-            int x, y; double dist;
-            cout << "X: "; cin >> x;
-            cout << "Y: "; cin >> y;
-            cout << "Distancia maxima: "; cin >> dist;
-=======
             cout << "X: "; int x = lerInteiroSeguro();
             cout << "Y: "; int y = lerInteiroSeguro();
             cout << "Distancia maxima: "; double dist = lerDoubleSeguro();
->>>>>>> ajustes
             
             auto inicio = chrono::high_resolution_clock::now();
             resultado = filtrarPorDistancia(resultado, x, y, dist);
@@ -418,12 +372,7 @@ vector<Cinema> Buscador::buscarCinemas() {
             cout << "Tempo de busca: " << dur.count()*1000<< " ms\n";
 
         } else if (opcao == 6) {
-<<<<<<< HEAD
-            double pmax;
-            cout << "Preco maximo: "; cin >> pmax;
-=======
             cout << "Preco maximo: "; double pmax = lerDoubleSeguro();
->>>>>>> ajustes
             
             auto inicio = chrono::high_resolution_clock::now();
             resultado = filtrarPorPreco(resultado, pmax);
@@ -434,7 +383,7 @@ vector<Cinema> Buscador::buscarCinemas() {
         } else if (opcao == 7) {
             string titulo;
             cout << "Titulo do filme: ";
-            cin.ignore(numeric_limits<streamsize>::max(), '\n'); // Garante que o buffer esteja limpo antes do getline
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
             getline(cin, titulo);
             
             auto inicio = chrono::high_resolution_clock::now();
@@ -444,14 +393,8 @@ vector<Cinema> Buscador::buscarCinemas() {
             cout << "Tempo de busca: " << dur.count()*1000<< " ms\n";
             
         } else if (opcao == 8) {
-<<<<<<< HEAD
-            int qtd;
-            cout << "Quantos resultados deseja exibir? ";
-            cin >> qtd;
-=======
             cout << "Quantos resultados deseja exibir? ";
             int qtd = lerInteiroSeguro();
->>>>>>> ajustes
             
             int limite = qtd;
             if (qtd > (int)resultado.size()) {
@@ -461,19 +404,11 @@ vector<Cinema> Buscador::buscarCinemas() {
             
             cout << "\n--- RESULTADOS ---" << endl;
             for (int i = 0; i < limite; ++i) {
-<<<<<<< HEAD
-                cout << i + 1 << ". " << resultado[i].getNomeCinema() << endl; // *Nota: Ajuste para o método que retorna o nome do seu Cinema
-=======
                 cout << i + 1 << ". " << resultado[i].getNomeCinema() << endl; 
->>>>>>> ajustes
             }
             cout << "------------------\n";
         }
 
-<<<<<<< HEAD
-        // Exibe quantidade parcial apenas se a opção foi um filtro
-=======
->>>>>>> ajustes
         if (opcao >= 1 && opcao <= 7)
             cout << "Resultados parciais: " << resultado.size() << endl;
 
