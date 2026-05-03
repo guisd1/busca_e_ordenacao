@@ -2,10 +2,11 @@
 #include <iostream>
 #include <cmath>
 #include <algorithm>
+#include <unordered_map>
 #include <chrono>
 using namespace std;
 
-Buscador::Buscador(const vector<Filme>& f, const vector<Cinema>& c, const unordered_map<string, int>& idx)
+Buscador(const std::vector<Filme>& f, const std::vector<Cinema>& c, const std::unordered_map<std::string, int>& idx);
     : filmes(f), cinemas(c), indice(idx) {}
 
 // ── AUXILIAR ────────────────────────────────────────────────────
@@ -199,6 +200,7 @@ vector<Filme> Buscador::buscarFilmes() {
         cout << "2. Por genero" << endl;
         cout << "3. Por duracao" << endl;
         cout << "4. Por ano" << endl;
+        cout << "5. Exibir resultados" << endl;
         cout << "0. Concluir" << endl;
         cout << "Opcao: ";
         cin >> opcao;
@@ -208,33 +210,67 @@ vector<Filme> Buscador::buscarFilmes() {
             cout << "Quantos tipos? "; cin >> n;
             vector<string> tipos(n);
             for (auto& t : tipos) { cout << "Tipo: "; cin >> t; }
+            
             auto inicio = chrono::high_resolution_clock::now();
             resultado = filtrarPorTipo(resultado, tipos, op == 2);
             auto fim = chrono::high_resolution_clock::now();
             chrono::duration<double> dur = fim - inicio;
-            
+            cout << "Tempo de busca: " << dur.count()*1000<< " ms\n";
 
         } else if (opcao == 2) {
             int op, n; cout << "Operador (1=OU 2=E): "; cin >> op;
             cout << "Quantos generos? "; cin >> n;
             vector<string> gens(n);
             for (auto& g : gens) { cout << "Genero: "; cin >> g; }
+            
+            auto inicio = chrono::high_resolution_clock::now();
             resultado = filtrarPorGenero(resultado, gens, op == 2);
+            auto fim = chrono::high_resolution_clock::now();
+            chrono::duration<double> dur = fim - inicio;
+            cout << "Tempo de busca: " << dur.count()*1000<< " ms\n";
 
         } else if (opcao == 3) {
             int mn, mx;
             cout << "Duracao minima (min): "; cin >> mn;
             cout << "Duracao maxima (min): "; cin >> mx;
+            
+            auto inicio = chrono::high_resolution_clock::now();
             resultado = filtrarPorDuracao(resultado, mn, mx);
+            auto fim = chrono::high_resolution_clock::now();
+            chrono::duration<double> dur = fim - inicio;
+            cout << "Tempo de busca: " << dur.count()*1000<< " ms\n";
 
         } else if (opcao == 4) {
             int a1, a2;
             cout << "Ano inicial: "; cin >> a1;
             cout << "Ano final:   "; cin >> a2;
+            
+            auto inicio = chrono::high_resolution_clock::now();
             resultado = filtrarPorAno(resultado, a1, a2);
+            auto fim = chrono::high_resolution_clock::now();
+            chrono::duration<double> dur = fim - inicio;
+            cout << "Tempo de busca: " << dur.count()*1000<< " ms\n";
+            
+        } else if (opcao == 5) {
+            int qtd;
+            cout << "Quantos resultados deseja exibir? ";
+            cin >> qtd;
+            
+            int limite = qtd;
+            if (qtd > (int)resultado.size()) {
+                limite = min((int)resultado.size(), 10);
+                cout << "[Aviso] Quantidade solicitada excede o total de resultados. Exibindo ate os " << limite << " primeiros...\n";
+            }
+            
+            cout << "\n--- RESULTADOS ---" << endl;
+            for (int i = 0; i < limite; ++i) {
+                cout << i + 1 << ". " << resultado[i].getTituloPrimario() << " (" << resultado[i].getAnoLancamento() << ")" << endl;
+            }
+            cout << "------------------\n";
         }
 
-        if (opcao != 0)
+        // Exibe quantidade parcial apenas se a opção foi um filtro
+        if (opcao >= 1 && opcao <= 4)
             cout << "Resultados parciais: " << resultado.size() << endl;
 
     } while (opcao != 0);
@@ -253,6 +289,7 @@ vector<Cinema> Buscador::buscarCinemas() {
         cout << "5. Por distancia" << endl;
         cout << "6. Por preco" << endl;
         cout << "7. Por titulo de filme" << endl;
+        cout << "8. Exibir resultados" << endl;
         cout << "0. Concluir" << endl;
         cout << "Opcao: ";
         cin >> opcao;
@@ -262,48 +299,101 @@ vector<Cinema> Buscador::buscarCinemas() {
             cout << "Quantos tipos? "; cin >> n;
             vector<string> tipos(n);
             for (auto& t : tipos) { cout << "Tipo: "; cin >> t; }
+            
+            auto inicio = chrono::high_resolution_clock::now();
             resultado = filtrarCinemaPorTipo(resultado, tipos, op == 2);
+            auto fim = chrono::high_resolution_clock::now();
+            chrono::duration<double> dur = fim - inicio;
+            cout << "Tempo de busca: " << dur.count()*1000<< " ms\n";
 
         } else if (opcao == 2) {
             int op, n; cout << "Operador (1=OU 2=E): "; cin >> op;
             cout << "Quantos generos? "; cin >> n;
             vector<string> gens(n);
             for (auto& g : gens) { cout << "Genero: "; cin >> g; }
+            
+            auto inicio = chrono::high_resolution_clock::now();
             resultado = filtrarCinemaPorGenero(resultado, gens, op == 2);
+            auto fim = chrono::high_resolution_clock::now();
+            chrono::duration<double> dur = fim - inicio;
+            cout << "Tempo de busca: " << dur.count()*1000<< " ms\n";
 
         } else if (opcao == 3) {
             int mn, mx;
             cout << "Duracao minima (min): "; cin >> mn;
             cout << "Duracao maxima (min): "; cin >> mx;
+            
+            auto inicio = chrono::high_resolution_clock::now();
             resultado = filtrarCinemaPorDuracao(resultado, mn, mx);
+            auto fim = chrono::high_resolution_clock::now();
+            chrono::duration<double> dur = fim - inicio;
+            cout << "Tempo de busca: " << dur.count()*1000<< " ms\n";
 
         } else if (opcao == 4) {
             int a1, a2;
             cout << "Ano inicial: "; cin >> a1;
             cout << "Ano final:   "; cin >> a2;
+            
+            auto inicio = chrono::high_resolution_clock::now();
             resultado = filtrarCinemaPorAno(resultado, a1, a2);
+            auto fim = chrono::high_resolution_clock::now();
+            chrono::duration<double> dur = fim - inicio;
+            cout << "Tempo de busca: " << dur.count()*1000<< " ms\n";
 
         } else if (opcao == 5) {
             int x, y; double dist;
             cout << "X: "; cin >> x;
             cout << "Y: "; cin >> y;
             cout << "Distancia maxima: "; cin >> dist;
+            
+            auto inicio = chrono::high_resolution_clock::now();
             resultado = filtrarPorDistancia(resultado, x, y, dist);
+            auto fim = chrono::high_resolution_clock::now();
+            chrono::duration<double> dur = fim - inicio;
+            cout << "Tempo de busca: " << dur.count()*1000<< " ms\n";
 
         } else if (opcao == 6) {
             double pmax;
             cout << "Preco maximo: "; cin >> pmax;
+            
+            auto inicio = chrono::high_resolution_clock::now();
             resultado = filtrarPorPreco(resultado, pmax);
+            auto fim = chrono::high_resolution_clock::now();
+            chrono::duration<double> dur = fim - inicio;
+            cout << "Tempo de busca: " << dur.count()*1000<< " ms\n";
 
         } else if (opcao == 7) {
             string titulo;
             cout << "Titulo do filme: ";
             cin.ignore();
             getline(cin, titulo);
+            
+            auto inicio = chrono::high_resolution_clock::now();
             resultado = filtrarCinemaPorTitulo(resultado, titulo);
+            auto fim = chrono::high_resolution_clock::now();
+            chrono::duration<double> dur = fim - inicio;
+            cout << "Tempo de busca: " << dur.count()*1000<< " ms\n";
+            
+        } else if (opcao == 8) {
+            int qtd;
+            cout << "Quantos resultados deseja exibir? ";
+            cin >> qtd;
+            
+            int limite = qtd;
+            if (qtd > (int)resultado.size()) {
+                limite = min((int)resultado.size(), 10);
+                cout << "Quantidade solicitada excede o total de resultados. Apenas os " << limite << " primeiros serão exibidos!\n";
+            }
+            
+            cout << "\n--- RESULTADOS ---" << endl;
+            for (int i = 0; i < limite; ++i) {
+                cout << i + 1 << ". " << resultado[i].getNomeCinema() << endl; // *Nota: Ajuste para o método que retorna o nome do seu Cinema
+            }
+            cout << "------------------\n";
         }
 
-        if (opcao != 0)
+        // Exibe quantidade parcial apenas se a opção foi um filtro
+        if (opcao >= 1 && opcao <= 7)
             cout << "Resultados parciais: " << resultado.size() << endl;
 
     } while (opcao != 0);

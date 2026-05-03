@@ -1,41 +1,41 @@
 #ifndef FILME_H
 #define FILME_H
-
-#include<string>
-#include<vector>
-
+#include <string>
+#include <vector>
 using namespace std;
 
 class Filme {
-    private: 
-        int ano_lancamento, tempo_filme;
-        string ID, tipo_titulo, titulo_primario, titulo_original;
-        vector<string> genero;
-        bool eh_adulto;
+private:
+    int ano_lancamento, tempo_filme;
+    string ID, tipo_titulo, titulo_primario, titulo_original;
+    vector<string> genero;
+    bool eh_adulto;
 
-    public:
-        Filme();
-        Filme(string ID, int ano_lancamento, int tempo_filme, const string &tipo_titulo, const string &titulo_primario, const string &titulo_original, const vector<string> &genero, bool eh_adulto);
+public:
+    Filme();
+    Filme(const string& ID, int ano_lancamento, int tempo_filme,
+          const string& tipo_titulo, const string& titulo_primario,
+          const string& titulo_original, const vector<string>& genero, bool eh_adulto);
 
-        // Getters
-        string getID() const;
-        int getAnoLancamento() const;
-        int getTempoFilme() const;
-        string getTipoTitulo() const;
-        string getTituloPrimario() const;
-        string getTituloOriginal() const;
-        vector<string> getGenero() const;
-        bool isEhAdulto() const;
+    // Getters — por referência const, sem cópia
+    const string&         getID()             const;
+    int                   getAnoLancamento()  const;
+    int                   getTempoFilme()     const;
+    const string&         getTipoTitulo()     const;
+    const string&         getTituloPrimario() const;
+    const string&         getTituloOriginal() const;
+    const vector<string>& getGenero()         const;
+    bool                  isEhAdulto()        const;
 
-        // Setters
-        void setID(string ID);
-        void setAnoLancamento(int ano_lancamento);
-        void setTempoFilme(int tempo_filme);
-        void setTipoTitulo(const string &tipo_titulo);
-        void setTituloPrimario(const string &titulo_primario);
-        void setTituloOriginal(const string &titulo_original);
-        void setGenero(const vector<string> &genero);
-        void setEhAdulto(bool eh_adulto);
+    // Setters — recebem por valor para permitir move
+    void setID(string id);
+    void setAnoLancamento(int ano);
+    void setTempoFilme(int tempo);
+    void setTipoTitulo(string tipo);
+    void setTituloPrimario(string titulo);
+    void setTituloOriginal(string titulo);
+    void setGenero(vector<string> genero);
+    void setEhAdulto(bool adulto);
 };
 
-#endif // FILME_H
+#endif
