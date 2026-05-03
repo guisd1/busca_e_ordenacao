@@ -89,7 +89,7 @@ public:
         //CINEMAS
         ifstream arquivoCinemas("documentos/cinemas.txt");
         if (!arquivoCinemas.is_open()) { cout << "Erro ao abrir cinemas!" << endl; return; }
-        getline(arquivoCinemas, linha);
+        getline(arquivoCinemas, linha); 
 
         while (getline(arquivoCinemas, linha)) {
             if (linha.empty()) continue;
