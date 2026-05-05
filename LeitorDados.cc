@@ -133,7 +133,7 @@ void LeitorDados::lerDados() {
         size_t cursor = 0, divisor;
         auto extrair = [&](char delim) -> string {
             if (cursor == string::npos) return "";
-            divisor = linha.find(delim, cursor);
+            divisor = linha.find(delim, cursor); 
             string campo = linha.substr(cursor, divisor - cursor);
             cursor = (divisor == string::npos) ? string::npos : divisor + 1;
             return campo;
@@ -177,7 +177,7 @@ void LeitorDados::lerDados() {
     chrono::duration<double> dur = fim - inicio;
     cout << "Filmes lidos:  " << listaFilmes.size() << "\n";
     cout << "Cinemas lidos: " << listaCinemas.size() << "\n";
-    cout << "Tempo de carregamento: " << dur.count() * 1000 << " ms\n";
+    cout << "Tempo de carregamento: " << dur.count()<< " s\n";
 }
 
 const vector<Filme>&            LeitorDados::getFilmes()  const { return listaFilmes; }
